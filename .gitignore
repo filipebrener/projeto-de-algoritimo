@@ -1,0 +1,6 @@
+main.o
+main
+
+insertion_sort/arquivodeentrada/*
+insertion_sort/arquivodesaida/*
+insertion_sort/tempo/*
