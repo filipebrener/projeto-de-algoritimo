@@ -225,7 +225,7 @@ int main(){
             printf("Executando para um array de %d elementos: ", size_list[i]);
             structure s = structure_factory(size_list[i], order, algorithm);
             sort_and_save(&s);
-            free_structure(s);
+            //free_structure(s);
             printf("OK!\n");
         }
         printf("Algoritimo executado com sucesso!\n");
