@@ -209,10 +209,23 @@ void free_structure(structure s){
     free(s.time_file_path);
 }
 
+int select_quantity(int size_list[]){
+    int quantity;
+    printf("CODE: TAMANHO\n");
+    for(int i = 0; i < 6; i++){
+        printf("%d   : %d\n", i, size_list[i]);
+    }
+    printf("6   : Todos os tamanhos\n");
+    printf("Escolha: ");
+    scanf("%d",&quantity);
+    return quantity;
+}
+
 int main(){
     int size_list[6] = {10, 100, 1000, 10000, 100000, 1000000};
     Algorithm algorithm;
     Order order;
+    int quantity_index;
     int is_to_continue;
     do{
         system("clear");
@@ -220,15 +233,26 @@ int main(){
         system("clear");
         order = select_order();
         system("clear");
-        printf("Executando algoritimo %s em um array inicial em ordem %s\n\n", get_algorithm_name(algorithm), get_order_name(order));
-        for(int i = 0; i < 6; i++){
-            printf("Executando para um array de %d elementos: ", size_list[i]);
-            structure s = structure_factory(size_list[i], order, algorithm);
+        quantity_index = select_quantity(size_list);
+        if(quantity_index < 6 && quantity_index >= 0){
+            printf("Executando algoritimo %s em um array inicial em ordem %s\n", get_algorithm_name(algorithm), get_order_name(order));
+            printf("Executando para um array de %d elementos: ", size_list[quantity_index]);
+            structure s = structure_factory(size_list[quantity_index], order, algorithm);
             sort_and_save(&s);
-            //free_structure(s);
             printf("OK!\n");
+            printf("Algoritimo executado com sucesso!\n");
+        } else if(quantity_index == 6){
+            printf("Executando algoritimo %s em um array inicial em ordem %s\n\n", get_algorithm_name(algorithm), get_order_name(order));
+            for(int i = 0; i < 6; i++){
+                printf("Executando para um array de %d elementos: ", size_list[i]);
+                structure s = structure_factory(size_list[i], order, algorithm);
+                sort_and_save(&s);
+                printf("OK!\n");
+            }
+            printf("Algoritimo executado com sucesso!\n");
+        } else {
+            printf("Opção escolhida é inválida!\n");
         }
-        printf("Algoritimo executado com sucesso!\n");
         printf("Digite 0 para sair ou qualquer outra coisa para voltar ao inicio: ");
         scanf("%d", &is_to_continue);
     }while(is_to_continue);
