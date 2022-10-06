@@ -2,6 +2,10 @@
 #include <stdlib.h>
 #include<time.h>
 
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+
 // caminhos dos arquivos
 #define INPUT_PATH "arquivodeentrada"
 #define OUTPUT_PATH "arquivodesaida"
@@ -52,11 +56,57 @@ structure structure_factory(int input_size, Order order, Algorithm algorithm);
 int* get_input_list(int input_size, Order order);
 void insertion_sort(structure *s);
 void sort_and_save(structure *s);
+void create_directory_if_not_exists(const char *dir);
+Order select_order();
+int select_quantity(int size_list[]);
+Algorithm select_algorithm();
+
+int main(){
+    int size_list[6] = {10, 100, 1000, 10000, 100000, 1000000};
+    Algorithm algorithm;
+    Order order;
+    int quantity_index;
+    int is_to_continue;
+    do{
+        system("clear");
+        algorithm = select_algorithm();
+        system("clear");
+        order = select_order();
+        system("clear");
+        quantity_index = select_quantity(size_list);
+        if(quantity_index < 6 && quantity_index >= 0){
+            printf("Executando algoritimo %s em um array inicial em ordem %s\n", get_algorithm_name(algorithm), get_order_name(order));
+            printf("Executando para um array de %d elementos: ", size_list[quantity_index]);
+            structure s = structure_factory(size_list[quantity_index], order, algorithm);
+            sort_and_save(&s);
+            printf("OK!\n");
+            printf("Algoritimo executado com sucesso!\n");
+        } else if(quantity_index == 6){
+            printf("Executando algoritimo %s em um array inicial em ordem %s\n\n", get_algorithm_name(algorithm), get_order_name(order));
+            for(int i = 0; i < 6; i++){
+                printf("Executando para um array de %d elementos: ", size_list[i]);
+                structure s = structure_factory(size_list[i], order, algorithm);
+                sort_and_save(&s);
+                printf("OK!\n");
+                free_structure(s);
+            }
+            printf("Algoritimo executado com sucesso!\n");
+        } else {
+            printf("Opção escolhida é inválida!\n");
+        }
+        printf("Digite 0 para sair ou qualquer outro numero para voltar ao inicio: ");
+        scanf("%d", &is_to_continue);
+    }while(is_to_continue);
+    return 0;
+}
 
 // funções
 char* get_file_path(Algorithm algorithm, char* path, int input_size, Order order){
     char* file_path = (char*) malloc(41 * sizeof(char));
-    sprintf(file_path,"%s/%s/%s%d.txt",get_algorithm_name(algorithm), path, get_order_name(order), input_size);
+    char folder_path[30];
+    sprintf(folder_path,"%s/%s",get_algorithm_name(algorithm), path);
+    create_directory_if_not_exists(folder_path);
+    sprintf(file_path,"%s/%s%d.txt", folder_path, get_order_name(order), input_size);
     return file_path;
 }
 
@@ -221,40 +271,19 @@ int select_quantity(int size_list[]){
     return quantity;
 }
 
-int main(){
-    int size_list[6] = {10, 100, 1000, 10000, 100000, 1000000};
-    Algorithm algorithm;
-    Order order;
-    int quantity_index;
-    int is_to_continue;
-    do{
-        system("clear");
-        algorithm = select_algorithm();
-        system("clear");
-        order = select_order();
-        system("clear");
-        quantity_index = select_quantity(size_list);
-        if(quantity_index < 6 && quantity_index >= 0){
-            printf("Executando algoritimo %s em um array inicial em ordem %s\n", get_algorithm_name(algorithm), get_order_name(order));
-            printf("Executando para um array de %d elementos: ", size_list[quantity_index]);
-            structure s = structure_factory(size_list[quantity_index], order, algorithm);
-            sort_and_save(&s);
-            printf("OK!\n");
-            printf("Algoritimo executado com sucesso!\n");
-        } else if(quantity_index == 6){
-            printf("Executando algoritimo %s em um array inicial em ordem %s\n\n", get_algorithm_name(algorithm), get_order_name(order));
-            for(int i = 0; i < 6; i++){
-                printf("Executando para um array de %d elementos: ", size_list[i]);
-                structure s = structure_factory(size_list[i], order, algorithm);
-                sort_and_save(&s);
-                printf("OK!\n");
-            }
-            printf("Algoritimo executado com sucesso!\n");
-        } else {
-            printf("Opção escolhida é inválida!\n");
+void create_directory_if_not_exists(const char *dir){
+    char tmp[256];
+    char *p = NULL;
+    size_t len;
+
+    snprintf(tmp, sizeof(tmp),"%s",dir);
+    len = strlen(tmp);
+    if(tmp[len - 1] == '/') tmp[len - 1] = 0;
+    for(p = tmp + 1; *p; p++)
+        if(*p == '/') {
+            *p = 0;
+            mkdir(tmp, S_IRWXU);
+            *p = '/';
         }
-        printf("Digite 0 para sair ou qualquer outra coisa para voltar ao inicio: ");
-        scanf("%d", &is_to_continue);
-    }while(is_to_continue);
-    return 0;
+    mkdir(tmp, S_IRWXU);
 }
