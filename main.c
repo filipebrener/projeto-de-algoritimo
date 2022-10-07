@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include<time.h>
+#include <string.h>
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -60,6 +61,7 @@ void create_directory_if_not_exists(const char *dir);
 Order select_order();
 int select_quantity(int size_list[]);
 Algorithm select_algorithm();
+void free_structure(structure s);
 
 int main(){
     int size_list[6] = {10, 100, 1000, 10000, 100000, 1000000};
