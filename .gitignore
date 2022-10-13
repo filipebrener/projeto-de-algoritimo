@@ -1,6 +1,6 @@
 main.o
 main
-insertion_sort
-bubble_sort
-selection_sort
-shell_sort
+# insertion_sort
+# bubble_sort
+# selection_sort
+# shell_sort
