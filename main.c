@@ -21,11 +21,17 @@ typedef enum {
 
 typedef enum {
     INSERTION_SORT,
+    BUBBLE_SORT,
+    SELECTION_SORT,
+    SHELL_SORT
 }Algorithm;
 
 char* get_algorithm_name(Algorithm algorithm){
    switch (algorithm){
       case INSERTION_SORT: return "insertion_sort";
+      case BUBBLE_SORT: return "bubble_sort";
+      case SELECTION_SORT: return "selection_sort";
+      case SHELL_SORT: return "shell_sort";
       default:
         printf("Algoritimo invalido: %s", get_algorithm_name(algorithm));
         abort();
@@ -56,6 +62,9 @@ char* get_file_path(Algorithm algorithm, char* path, int input_size, Order order
 structure structure_factory(int input_size, Order order, Algorithm algorithm);
 int* get_input_list(int input_size, Order order);
 void insertion_sort(structure *s);
+void bubble_sort(structure *s);
+void selection_sort(structure *s);
+void shell_sort(structure *s);
 void sort_and_save(structure *s);
 void create_directory_if_not_exists(const char *dir);
 Order select_order();
@@ -79,6 +88,7 @@ int main(){
         if(quantity_index < 6 && quantity_index >= 0){
             printf("Executando algoritimo %s em um array inicial em ordem %s\n", get_algorithm_name(algorithm), get_order_name(order));
             printf("Executando para um array de %d elementos: ", size_list[quantity_index]);
+            fflush(stdout);
             structure s = structure_factory(size_list[quantity_index], order, algorithm);
             sort_and_save(&s);
             printf("OK!\n");
@@ -87,6 +97,7 @@ int main(){
             printf("Executando algoritimo %s em um array inicial em ordem %s\n\n", get_algorithm_name(algorithm), get_order_name(order));
             for(int i = 0; i < 6; i++){
                 printf("Executando para um array de %d elementos: ", size_list[i]);
+                fflush(stdout);
                 structure s = structure_factory(size_list[i], order, algorithm);
                 sort_and_save(&s);
                 printf("OK!\n");
@@ -177,6 +188,9 @@ void sort_and_save(structure *s){
     save_in_file(*s, s->input_file_path);
     switch (s->algorithm){
         case INSERTION_SORT: insertion_sort(s);
+        case BUBBLE_SORT: bubble_sort(s);
+        case SELECTION_SORT: selection_sort(s);
+        case SHELL_SORT: shell_sort(s);
     }
     save_in_file(*s, s->output_file_path);
     save_time_in_file(*s,s->time_file_path);
@@ -200,6 +214,66 @@ void insertion_sort(structure *s){
     s->execution_time += (double)(end - begin) / CLOCKS_PER_SEC;
 }
 
+void bubble_sort(structure *s){
+    s->execution_time = 0.0;
+    int aux;
+    clock_t begin = clock();
+    for(int i = 0; i < s->input_size; i++){
+        for(int j = 0; j < s->input_size - i; j ++){
+            if(s->input_list[j] > s->input_list[j + 1]){
+                aux = s->input_list[j];
+                s->input_list[j] = s->input_list[j + 1];
+                s->input_list[j + 1] = aux;
+            }
+        }
+    }
+    clock_t end = clock();
+    s->execution_time += (double)(end - begin) / CLOCKS_PER_SEC;
+}
+
+void selection_sort(structure *s){
+    s->execution_time = 0.0;
+    int current_lower_index;
+    int aux;
+    clock_t begin = clock();
+    for(int i = 0; i < s->input_size; i++){
+        current_lower_index = i;
+        for(int j = i + 1; j < s->input_size; j ++){
+            if(s->input_list[current_lower_index] < s->input_list[j]){
+                current_lower_index = j;
+            }
+        }
+        aux = s->input_list[i];
+        s->input_list[i] = s->input_list[current_lower_index];
+        s->input_list[current_lower_index] = aux;
+    }
+    clock_t end = clock();
+    s->execution_time += (double)(end - begin) / CLOCKS_PER_SEC;
+}
+
+void shell_sort(structure *s){
+    int j, current_value;
+    clock_t begin = clock();
+    int h = 1;
+    while(h < s->input_size) {
+        h = 3*h+1;
+    }
+    while (h > 0) {
+        for(int i = h; i < s->input_size; i++) {
+            current_value = s->input_list[i];
+            j = i;
+            while (j > h-1 && current_value <= s->input_list[j - h]) {
+                s->input_list[j] = s->input_list[j - h];
+                j = j - h;
+            }
+            s->input_list[j] = current_value;
+        }
+        h = h/3;
+    }
+    clock_t end = clock();
+    s->execution_time += (double)(end - begin) / CLOCKS_PER_SEC;
+}
+
 void print_list(int* list, int list_size){
     for(int i = 0; i < list_size; i++){
         printf("%d ", list[i]);
@@ -210,6 +284,9 @@ void print_list(int* list, int list_size){
 void show_algorithm_list(){
     printf("CODE: ALGORITHM\n");
     printf("1   : INSERTION SORT\n");
+    printf("2   : BUBBLE SORT\n");
+    printf("3   : SELECTION SORT\n");
+    printf("4   : SHELL SORT\n");
     printf("\n");
 }
 
@@ -229,6 +306,9 @@ Algorithm select_algorithm(){
         scanf("%d", &algorithm_code);
         switch(algorithm_code){
             case 1: return INSERTION_SORT;
+            case 2: return BUBBLE_SORT;
+            case 3: return SELECTION_SORT;
+            case 4: return SHELL_SORT;
             default:
                 printf("Opcao invalida: %d\n", algorithm_code);
                 printf("Digite um valor válido para o algoritimo: ");
