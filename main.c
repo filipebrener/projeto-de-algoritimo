@@ -204,7 +204,7 @@ void insertion_sort(structure *s){
     for(int i = 1; i < s->input_size; i++){
         current_number = s->input_list[i];
         current_index = i - 1;
-        while(current_index > 0 && s->input_list[current_index] > current_number){
+        while(current_index >= 0 && s->input_list[current_index] > current_number){
             s->input_list[current_index + 1] = s->input_list[current_index];
             current_index--;
         }
